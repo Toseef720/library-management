@@ -34,11 +34,6 @@
                     Books
                 </a>
 
-                <a href="students.php"
-                   class="block px-4 py-3 rounded-lg hover:bg-gray-800">
-                    Students
-                </a>
-
                 <a href="issue-return.php"
                    class="block px-4 py-3 rounded-lg hover:bg-gray-800">
                     Issue / Return
@@ -90,8 +85,8 @@
                 </div>
 
                 <div class="bg-white rounded-xl p-6 shadow-sm">
-                    <p class="text-gray-500 text-sm">Total Students</p>
-                    <h3 class="text-3xl font-bold mt-2">64</h3>
+                    <p class="text-gray-500 text-sm">Overdue Books</p>
+                    <h3 class="text-3xl font-bold mt-2">4</h3>
                 </div>
 
             </div>
