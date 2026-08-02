@@ -61,21 +61,16 @@ displayBooks(books);
 
 function deleteBook(id) {
 
-    const confirmDelete = confirm("Are you sure you want to delete this book?");
+    const confirmDelete = confirm(
+        "Are you sure you want to delete this book?"
+    );
 
     if (!confirmDelete) {
         return;
     }
 
-    for (let i = 0; i < books.length; i++) {
-
-        if (books[i].id === id) {
-            books.splice(i, 1);
-            break;
-        }
-    }
-
-    displayBooks(books);
+    window.location.href =
+        "../actions/delete-book.php?id=" + id;
 }
 
 function editBook(id) {
@@ -84,7 +79,7 @@ function editBook(id) {
 
     for (let i = 0; i < books.length; i++) {
 
-        if (books[i].id === id) {
+        if (Number(books[i].id) === Number(id)) {
             selectedBook = books[i];
             break;
         }
@@ -94,8 +89,7 @@ function editBook(id) {
         return;
     }
 
-    editingBookId = id;
-
+    document.getElementById("bookId").value = selectedBook.id;
     document.getElementById("bookTitle").value = selectedBook.title;
     document.getElementById("bookAuthor").value = selectedBook.author;
     document.getElementById("bookCategory").value = selectedBook.category;
@@ -104,6 +98,8 @@ function editBook(id) {
 
     document.getElementById("bookModalTitle").innerText = "Edit Book";
     document.getElementById("bookSubmitButton").innerText = "Update Book";
+
+    bookForm.action = "../actions/edit-book.php";
 
     const modal = document.getElementById("bookModal");
 
@@ -131,12 +127,14 @@ bookSearch.addEventListener("input", function() {
 
 function openBookModal() {
 
-    editingBookId = null;
-
     bookForm.reset();
+
+    document.getElementById("bookId").value = "";
 
     document.getElementById("bookModalTitle").innerText = "Add Book";
     document.getElementById("bookSubmitButton").innerText = "Add Book";
+
+    bookForm.action = "../actions/add-book.php";
 
     const modal = document.getElementById("bookModal");
 
@@ -153,55 +151,3 @@ function closeBookModal() {
 }
 
 
-bookForm.addEventListener("submit", function(e) {
-
-    e.preventDefault();
-
-    const title = document.getElementById("bookTitle").value;
-    const author = document.getElementById("bookAuthor").value;
-    const category = document.getElementById("bookCategory").value;
-    const isbn = document.getElementById("bookISBN").value;
-    const quantity = Number(document.getElementById("bookQuantity").value);
-
-    if (editingBookId === null) {
-
-        const book = {
-            id: Date.now(),
-            title: title,
-            author: author,
-            category: category,
-            isbn: isbn,
-            quantity: quantity,
-            available: quantity
-        };
-
-        books.push(book);
-
-    } else {
-
-        for (let i = 0; i < books.length; i++) {
-
-            if (books[i].id === editingBookId) {
-
-                const issued = books[i].quantity - books[i].available;
-
-                books[i].title = title;
-                books[i].author = author;
-                books[i].category = category;
-                books[i].isbn = isbn;
-                books[i].quantity = quantity;
-                books[i].available = Math.max(quantity - issued, 0);
-
-                break;
-            }
-        }
-
-        editingBookId = null;
-    }
-
-    displayBooks(books);
-
-    bookForm.reset();
-
-    closeBookModal();
-});

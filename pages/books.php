@@ -1,3 +1,17 @@
+<?php
+
+require_once "../config/database.php";
+
+$result = $conn->query("SELECT * FROM books ORDER BY id DESC");
+
+$books = [];
+
+while ($row = $result->fetch_assoc()) {
+    $books[] = $row;
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,203 +25,204 @@
 
 <body class="bg-gray-100">
 
-<div class="flex min-h-screen">
+    <div class="flex min-h-screen">
 
-    <!-- Sidebar -->
-    <aside class="w-64 bg-gray-900 text-white p-5">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-gray-900 text-white p-5">
 
-        <div class="mb-10">
-            <h1 class="text-xl font-bold">Library Admin</h1>
-            <p class="text-gray-400 text-sm mt-1">Management System</p>
-        </div>
+            <div class="mb-10">
+                <h1 class="text-xl font-bold">Library Admin</h1>
+                <p class="text-gray-400 text-sm mt-1">Management System</p>
+            </div>
 
-        <nav class="space-y-2">
+            <nav class="space-y-2">
 
-            <a href="dashboard.php"
-               class="block px-4 py-3 rounded-lg hover:bg-gray-800">
-                Dashboard
-            </a>
+                <a href="dashboard.php"
+                    class="block px-4 py-3 rounded-lg hover:bg-gray-800">
+                    Dashboard
+                </a>
 
-            <a href="books.php"
-               class="block bg-blue-600 px-4 py-3 rounded-lg">
-                Books
-            </a>
-
-            <a href="students.php"
-               class="block px-4 py-3 rounded-lg hover:bg-gray-800">
-                Students
-            </a>
-
-            <a href="issue-return.php"
-               class="block px-4 py-3 rounded-lg hover:bg-gray-800">
-                Issue / Return
-            </a>
-
-        </nav>
-
-        <div class="mt-10">
-            <a href="../index.php"
-               class="block px-4 py-3 rounded-lg text-red-400 hover:bg-gray-800">
-                Logout
-            </a>
-        </div>
-
-    </aside>
-
-
-    <!-- Main -->
-    <main class="flex-1 p-8">
-
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-8">
-
-            <div>
-                <h2 class="text-3xl font-bold text-gray-800">
+                <a href="books.php"
+                    class="block bg-blue-600 px-4 py-3 rounded-lg">
                     Books
-                </h2>
+                </a>
 
-                <p class="text-gray-500 mt-1">
-                    Manage library books
-                </p>
+                <a href="students.php"
+                    class="block px-4 py-3 rounded-lg hover:bg-gray-800">
+                    Students
+                </a>
+
+                <a href="issue-return.php"
+                    class="block px-4 py-3 rounded-lg hover:bg-gray-800">
+                    Issue / Return
+                </a>
+
+            </nav>
+
+            <div class="mt-10">
+                <a href="../index.php"
+                    class="block px-4 py-3 rounded-lg text-red-400 hover:bg-gray-800">
+                    Logout
+                </a>
             </div>
 
-            <button
-                onclick="openBookModal()"
-                class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg font-medium">
-                + Add Book
-            </button>
-
-        </div>
+        </aside>
 
 
-        <!-- Search -->
-        <div class="bg-white p-5 rounded-xl shadow-sm mb-6">
+        <!-- Main -->
+        <main class="flex-1 p-8">
 
-            <input
-                type="text"
-                id="bookSearch"
-                placeholder="Search by title, author or ISBN..."
-                class="w-full md:w-96 border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-blue-500"
-            >
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-8">
 
-        </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-800">
+                        Books
+                    </h2>
 
+                    <p class="text-gray-500 mt-1">
+                        Manage library books
+                    </p>
+                </div>
 
-        <!-- Books Table -->
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-
-            <div class="overflow-x-auto">
-
-                <table class="w-full text-left">
-
-                    <thead class="bg-gray-50 text-gray-500 text-sm">
-
-                        <tr>
-                            <th class="px-6 py-4">Title</th>
-                            <th class="px-6 py-4">Author</th>
-                            <th class="px-6 py-4">Category</th>
-                            <th class="px-6 py-4">ISBN</th>
-                            <th class="px-6 py-4">Quantity</th>
-                            <th class="px-6 py-4">Available</th>
-                            <th class="px-6 py-4">Actions</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="bookTable"></tbody>
-
-                </table>
+                <button
+                    onclick="openBookModal()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg font-medium">
+                    + Add Book
+                </button>
 
             </div>
 
-        </div>
 
-    </main>
+            <!-- Search -->
+            <div class="bg-white p-5 rounded-xl shadow-sm mb-6">
 
-</div>
+                <input
+                    type="text"
+                    id="bookSearch"
+                    placeholder="Search by title, author or ISBN..."
+                    class="w-full md:w-96 border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-blue-500">
 
-
-<!-- Add Book Modal -->
-<div
-    id="bookModal"
-    class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4">
-
-    <div class="bg-white rounded-xl w-full max-w-lg p-6">
-
-        <div class="flex justify-between items-center mb-6">
-
-            <h3 id="bookModalTitle" class="text-xl font-semibold">
-                Add Book
-            </h3>
-
-            <button
-                onclick="closeBookModal()"
-                class="text-gray-500 text-xl">
-                ×
-            </button>
-
-        </div>
+            </div>
 
 
-        <form id="bookForm" class="space-y-4">
+            <!-- Books Table -->
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
 
-            <input
-                id="bookTitle"
-                type="text"
-                placeholder="Book Title"
-                required
-                class="w-full border rounded-lg px-4 py-3"
-            >
+                <div class="overflow-x-auto">
 
-            <input
-                id="bookAuthor"
-                type="text"
-                placeholder="Author"
-                required
-                class="w-full border rounded-lg px-4 py-3"
-            >
+                    <table class="w-full text-left">
 
-            <input
-                id="bookCategory"
-                type="text"
-                placeholder="Category"
-                required
-                class="w-full border rounded-lg px-4 py-3"
-            >
+                        <thead class="bg-gray-50 text-gray-500 text-sm">
 
-            <input
-                id="bookISBN"
-                type="text"
-                placeholder="ISBN"
-                required
-                class="w-full border rounded-lg px-4 py-3"
-            >
+                            <tr>
+                                <th class="px-6 py-4">Title</th>
+                                <th class="px-6 py-4">Author</th>
+                                <th class="px-6 py-4">Category</th>
+                                <th class="px-6 py-4">ISBN</th>
+                                <th class="px-6 py-4">Quantity</th>
+                                <th class="px-6 py-4">Available</th>
+                                <th class="px-6 py-4">Actions</th>
+                            </tr>
 
-            <input
-                id="bookQuantity"
-                type="number"
-                min="1"
-                placeholder="Quantity"
-                required
-                class="w-full border rounded-lg px-4 py-3"
-            >
+                        </thead>
 
-            <button
-                id="bookSubmitButton"
-                type="submit"
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium">
-                Add Book
-            </button>
+                        <tbody id="bookTable"></tbody>
 
-        </form>
+                    </table>
+
+                </div>
+
+            </div>
+
+        </main>
 
     </div>
 
-</div>
+
+    <!-- Add Book Modal -->
+    <div
+        id="bookModal"
+        class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4">
+
+        <div class="bg-white rounded-xl w-full max-w-lg p-6">
+
+            <div class="flex justify-between items-center mb-6">
+
+                <h3 id="bookModalTitle" class="text-xl font-semibold">
+                    Add Book
+                </h3>
+
+                <button
+                    onclick="closeBookModal()"
+                    class="text-gray-500 text-xl">
+                    ×
+                </button>
+
+            </div>
 
 
-<script src="../assets/js/data.js"></script>
-<script src="../assets/js/books.js"></script>
+            <form id="bookForm" action="../actions/add-book.php" method="post" class="space-y-4">
+                <input type="hidden" id="bookId" name="id">
+                <input
+                    id="bookTitle"
+                    name="title"
+                    type="text"
+                    placeholder="Book Title"
+                    required
+                    class="w-full border rounded-lg px-4 py-3">
+
+                <input
+                    id="bookAuthor"
+                    name="author"
+                    type="text"
+                    placeholder="Author"
+                    required
+                    class="w-full border rounded-lg px-4 py-3">
+
+                <input
+                    id="bookCategory"
+                    name="category"
+                    type="text"
+                    placeholder="Category"
+                    required
+                    class="w-full border rounded-lg px-4 py-3">
+
+                <input
+                    id="bookISBN"
+                    name="isbn"
+                    type="text"
+                    placeholder="ISBN"
+                    required
+                    class="w-full border rounded-lg px-4 py-3">
+
+                <input
+                    id="bookQuantity"
+                    name="quantity"
+                    type="number"
+                    min="1"
+                    placeholder="Quantity"
+                    required
+                    class="w-full border rounded-lg px-4 py-3">
+
+                <button
+                    id="bookSubmitButton"
+                    type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium">
+                    Add Book
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <script>
+        const books = <?php echo json_encode($books); ?>
+    </script>
+    <script src="../assets/js/books.js"></script>
 
 </body>
+
 </html>
