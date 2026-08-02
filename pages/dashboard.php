@@ -25,17 +25,17 @@
             <nav class="space-y-2">
 
                 <a href="dashboard.php"
-                   class="block bg-blue-600 px-4 py-3 rounded-lg">
+                    class="block bg-blue-600 px-4 py-3 rounded-lg">
                     Dashboard
                 </a>
 
                 <a href="books.php"
-                   class="block px-4 py-3 rounded-lg hover:bg-gray-800">
+                    class="block px-4 py-3 rounded-lg hover:bg-gray-800">
                     Books
                 </a>
 
                 <a href="issue-return.php"
-                   class="block px-4 py-3 rounded-lg hover:bg-gray-800">
+                    class="block px-4 py-3 rounded-lg hover:bg-gray-800">
                     Issue / Return
                 </a>
 
@@ -43,7 +43,7 @@
 
             <div class="mt-10">
                 <a href="../index.php"
-                   class="block px-4 py-3 rounded-lg text-red-400 hover:bg-gray-800">
+                    class="block px-4 py-3 rounded-lg text-red-400 hover:bg-gray-800">
                     Logout
                 </a>
             </div>
@@ -71,22 +71,22 @@
 
                 <div class="bg-white rounded-xl p-6 shadow-sm">
                     <p class="text-gray-500 text-sm">Total Books</p>
-                    <h3 class="text-3xl font-bold mt-2">120</h3>
+                    <h3 id="totalBooks"class="text-3xl font-bold mt-2">120</h3>
                 </div>
 
                 <div class="bg-white rounded-xl p-6 shadow-sm">
                     <p class="text-gray-500 text-sm">Available Books</p>
-                    <h3 class="text-3xl font-bold mt-2">85</h3>
+                    <h3 id="availableBooks" class="text-3xl font-bold mt-2">85</h3>
                 </div>
 
                 <div class="bg-white rounded-xl p-6 shadow-sm">
                     <p class="text-gray-500 text-sm">Issued Books</p>
-                    <h3 class="text-3xl font-bold mt-2">35</h3>
+                    <h3 id="issuedCount"  class="text-3xl font-bold mt-2">35</h3>
                 </div>
 
                 <div class="bg-white rounded-xl p-6 shadow-sm">
                     <p class="text-gray-500 text-sm">Overdue Books</p>
-                    <h3 class="text-3xl font-bold mt-2">4</h3>
+                    <h3 id="overdueCount" class="text-3xl font-bold mt-2">4</h3>
                 </div>
 
             </div>
@@ -153,5 +153,10 @@
 
     </div>
 
+
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/dashboard.js"></script>
+
 </body>
+
 </html>
