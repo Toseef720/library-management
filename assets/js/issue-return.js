@@ -4,11 +4,12 @@ const issueSearch = document.getElementById("issueSearch");
 const bookSelect = document.getElementById("issueBook");
 
 
+// Find book using book ID
 function getBook(bookId) {
 
     for (let i = 0; i < books.length; i++) {
 
-        if (books[i].id === bookId) {
+        if (Number(books[i].id) === Number(bookId)) {
             return books[i];
         }
     }
@@ -17,17 +18,20 @@ function getBook(bookId) {
 }
 
 
+// Load available books in dropdown
 function loadBooks() {
 
-    bookSelect.innerHTML = '<option value="">Select Book</option>';
+    bookSelect.innerHTML =
+        '<option value="">Select Book</option>';
 
     for (let i = 0; i < books.length; i++) {
 
-        if (books[i].available > 0) {
+        if (Number(books[i].available) > 0) {
 
             bookSelect.innerHTML += `
                 <option value="${books[i].id}">
-                    ${books[i].title} (${books[i].available} available)
+                    ${books[i].title}
+                    (${books[i].available} available)
                 </option>
             `;
         }
@@ -35,27 +39,35 @@ function loadBooks() {
 }
 
 
+// Display issue records
 function displayIssues(data) {
 
     issueTable.innerHTML = "";
 
     for (let i = 0; i < data.length; i++) {
 
-        const book = getBook(data[i].bookId);
+        const book = getBook(data[i].book_id);
 
         if (book === null) {
             continue;
         }
 
-        let statusStyle = "bg-yellow-100 text-yellow-700";
+
+        let statusStyle =
+            "bg-yellow-100 text-yellow-700";
 
         if (data[i].status === "Overdue") {
-            statusStyle = "bg-red-100 text-red-700";
+
+            statusStyle =
+                "bg-red-100 text-red-700";
         }
 
         if (data[i].status === "Returned") {
-            statusStyle = "bg-green-100 text-green-700";
+
+            statusStyle =
+                "bg-green-100 text-green-700";
         }
+
 
         let action = "-";
 
@@ -75,11 +87,11 @@ function displayIssues(data) {
             <tr class="border-t border-gray-100">
 
                 <td class="px-6 py-4">
-                    ${data[i].studentName}
+                    ${data[i].student_name}
                 </td>
 
                 <td class="px-6 py-4">
-                    ${data[i].rollNo}
+                    ${data[i].roll_no}
                 </td>
 
                 <td class="px-6 py-4">
@@ -87,11 +99,11 @@ function displayIssues(data) {
                 </td>
 
                 <td class="px-6 py-4">
-                    ${data[i].issueDate}
+                    ${data[i].issue_date}
                 </td>
 
                 <td class="px-6 py-4">
-                    ${data[i].dueDate}
+                    ${data[i].due_date}
                 </td>
 
                 <td class="px-6 py-4">
@@ -111,117 +123,71 @@ function displayIssues(data) {
     }
 }
 
+
+// Open Issue Book modal
 function openIssueModal() {
+
     issueForm.reset();
+
     loadBooks();
 
-    const modal = document.getElementById("issueModal");
+    const modal =
+        document.getElementById("issueModal");
 
     modal.classList.remove("hidden");
     modal.classList.add("flex");
 }
 
+
+// Close Issue Book modal
 function closeIssueModal() {
-    const modal = document.getElementById("issueModal");
+
+    const modal =
+        document.getElementById("issueModal");
 
     modal.classList.add("hidden");
     modal.classList.remove("flex");
 }
 
 
-issueForm.addEventListener("submit", function(e) {
-
-    e.preventDefault();
-
-    const studentName = document.getElementById("studentName").value;
-    const rollNo = document.getElementById("rollNo").value;
-    const bookId = Number(document.getElementById("issueBook").value);
-    const issueDate = document.getElementById("issueDate").value;
-    const dueDate = document.getElementById("dueDate").value;
-
-    if (dueDate < issueDate) {
-        alert("Due date cannot be before issue date");
-        return;
-    }
-
-    const book = getBook(bookId);
-
-    if (book === null || book.available <= 0) {
-        alert("Book is not available");
-        return;
-    }
-
-    const issue = {
-        id: Date.now(),
-        studentName: studentName,
-        rollNo: rollNo,
-        bookId: bookId,
-        issueDate: issueDate,
-        dueDate: dueDate,
-        returnDate: null,
-        status: "Issued"
-    };
-
-    issuedBooks.push(issue);
-
-    book.available--;
-
-    displayIssues(issuedBooks);
-
-    issueForm.reset();
-
-    closeIssueModal();
-});
-
-
+// Return book
 function returnBook(id) {
 
-    const confirmReturn = confirm("Mark this book as returned?");
+    const confirmReturn =
+        confirm("Mark this book as returned?");
 
     if (!confirmReturn) {
         return;
     }
 
-    for (let i = 0; i < issuedBooks.length; i++) {
-
-        if (issuedBooks[i].id === id) {
-
-            if (issuedBooks[i].status === "Returned") {
-                return;
-            }
-
-            issuedBooks[i].status = "Returned";
-
-            issuedBooks[i].returnDate =
-                new Date().toISOString().split("T")[0];
-
-            const book = getBook(issuedBooks[i].bookId);
-
-            if (book !== null) {
-                book.available++;
-            }
-
-            break;
-        }
-    }
-
-    displayIssues(issuedBooks);
-    loadBooks();
+    window.location.href =
+        "../actions/return-book.php?id=" + id;
 }
 
+
+// Search issue records
 issueSearch.addEventListener("input", function() {
 
-    const value = issueSearch.value.trim().toLowerCase();
+    const value =
+        issueSearch.value.trim().toLowerCase();
 
     const filteredIssues = [];
 
     for (let i = 0; i < issuedBooks.length; i++) {
 
-        const book = getBook(issuedBooks[i].bookId);
+        const book =
+            getBook(issuedBooks[i].book_id);
 
-        const studentName = issuedBooks[i].studentName.toLowerCase();
-        const rollNo = issuedBooks[i].rollNo.toString().toLowerCase();
-        const bookTitle = book ? book.title.toLowerCase() : "";
+        const studentName =
+            issuedBooks[i].student_name.toLowerCase();
+
+        const rollNo =
+            issuedBooks[i].roll_no
+                .toString()
+                .toLowerCase();
+
+        const bookTitle =
+            book ? book.title.toLowerCase() : "";
 
         if (
             studentName.includes(value) ||
@@ -236,5 +202,6 @@ issueSearch.addEventListener("input", function() {
 });
 
 
+// Initial page load
 loadBooks();
 displayIssues(issuedBooks);

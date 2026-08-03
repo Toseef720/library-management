@@ -1,3 +1,73 @@
+<?php
+
+require_once "../config/database.php";
+
+
+// Total physical books
+$result = $conn->query(
+    "SELECT SUM(quantity) AS total FROM books"
+);
+
+$row = $result->fetch_assoc();
+
+$totalBooks = $row["total"] ?? 0;
+
+
+// Available books
+$result = $conn->query(
+    "SELECT SUM(available) AS total FROM books"
+);
+
+$row = $result->fetch_assoc();
+
+$availableBooks = $row["total"] ?? 0;
+
+
+// Currently issued books
+$result = $conn->query(
+    "SELECT COUNT(*) AS total
+     FROM issued_books
+     WHERE status != 'Returned'
+     AND due_date >= CURDATE()"
+);
+
+$row = $result->fetch_assoc();
+
+$issuedBooks = $row["total"];
+
+// Recent issues
+$recentResult = $conn->query(
+    "SELECT
+        issued_books.student_name,
+        issued_books.issue_date,
+        issued_books.due_date,
+        issued_books.status,
+        books.title
+
+     FROM issued_books
+
+     INNER JOIN books
+     ON issued_books.book_id = books.id
+
+     ORDER BY issued_books.id DESC
+
+     LIMIT 5"
+);
+
+// Overdue books
+$result = $conn->query(
+    "SELECT COUNT(*) AS total
+     FROM issued_books
+     WHERE status != 'Returned'
+     AND due_date < CURDATE()"
+);
+
+$row = $result->fetch_assoc();
+
+$overdueBooks = $row["total"];
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -71,22 +141,22 @@
 
                 <div class="bg-white rounded-xl p-6 shadow-sm">
                     <p class="text-gray-500 text-sm">Total Books</p>
-                    <h3 id="totalBooks"class="text-3xl font-bold mt-2">120</h3>
+                    <h3 class="text-3xl font-bold mt-2"><?php echo $totalBooks; ?></h3>
                 </div>
 
                 <div class="bg-white rounded-xl p-6 shadow-sm">
                     <p class="text-gray-500 text-sm">Available Books</p>
-                    <h3 id="availableBooks" class="text-3xl font-bold mt-2">85</h3>
+                    <h3 class="text-3xl font-bold mt-2"><?php echo $availableBooks; ?></h3>
                 </div>
 
                 <div class="bg-white rounded-xl p-6 shadow-sm">
                     <p class="text-gray-500 text-sm">Issued Books</p>
-                    <h3 id="issuedCount"  class="text-3xl font-bold mt-2">35</h3>
+                    <h3 class="text-3xl font-bold mt-2"><?php echo $issuedBooks; ?></h3>
                 </div>
 
                 <div class="bg-white rounded-xl p-6 shadow-sm">
                     <p class="text-gray-500 text-sm">Overdue Books</p>
-                    <h3 id="overdueCount" class="text-3xl font-bold mt-2">4</h3>
+                    <h3 class="text-3xl font-bold mt-2"><?php echo $overdueBooks; ?></h3>
                 </div>
 
             </div>
@@ -117,29 +187,66 @@
 
                         <tbody>
 
-                            <tr class="border-t border-gray-100">
-                                <td class="px-6 py-4">Rahul Sharma</td>
-                                <td class="px-6 py-4">Clean Code</td>
-                                <td class="px-6 py-4">01 Aug 2026</td>
-                                <td class="px-6 py-4">15 Aug 2026</td>
-                                <td class="px-6 py-4">
-                                    <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm">
-                                        Issued
-                                    </span>
-                                </td>
-                            </tr>
+                            <?php while ($issue = $recentResult->fetch_assoc()): ?>
 
-                            <tr class="border-t border-gray-100">
-                                <td class="px-6 py-4">Aman Verma</td>
-                                <td class="px-6 py-4">Database Systems</td>
-                                <td class="px-6 py-4">29 Jul 2026</td>
-                                <td class="px-6 py-4">12 Aug 2026</td>
-                                <td class="px-6 py-4">
-                                    <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm">
-                                        Issued
-                                    </span>
-                                </td>
-                            </tr>
+                                <?php
+
+                                $status = $issue["status"];
+
+                                if (
+                                    $status !== "Returned" &&
+                                    $issue["due_date"] < date("Y-m-d")
+                                ) {
+                                    $status = "Overdue";
+                                }
+
+                                ?>
+
+                                <tr class="border-t border-gray-100">
+
+                                    <td class="px-6 py-4">
+                                        <?php echo htmlspecialchars($issue["student_name"]); ?>
+                                    </td>
+
+                                    <td class="px-6 py-4">
+                                        <?php echo htmlspecialchars($issue["title"]); ?>
+                                    </td>
+
+                                    <td class="px-6 py-4">
+                                        <?php echo $issue["issue_date"]; ?>
+                                    </td>
+
+                                    <td class="px-6 py-4">
+                                        <?php echo $issue["due_date"]; ?>
+                                    </td>
+
+                                    <td class="px-6 py-4">
+
+                                        <?php if ($status === "Returned"): ?>
+
+                                            <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                                                Returned
+                                            </span>
+
+                                        <?php elseif ($status === "Overdue"): ?>
+
+                                            <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm">
+                                                Overdue
+                                            </span>
+
+                                        <?php else: ?>
+
+                                            <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm">
+                                                Issued
+                                            </span>
+
+                                        <?php endif; ?>
+
+                                    </td>
+
+                                </tr>
+
+                            <?php endwhile; ?>
 
                         </tbody>
 
@@ -152,10 +259,6 @@
         </main>
 
     </div>
-
-
-    <script src="../assets/js/data.js"></script>
-    <script src="../assets/js/dashboard.js"></script>
 
 </body>
 

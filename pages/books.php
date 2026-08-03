@@ -47,11 +47,6 @@ while ($row = $result->fetch_assoc()) {
                     Books
                 </a>
 
-                <a href="students.php"
-                    class="block px-4 py-3 rounded-lg hover:bg-gray-800">
-                    Students
-                </a>
-
                 <a href="issue-return.php"
                     class="block px-4 py-3 rounded-lg hover:bg-gray-800">
                     Issue / Return
@@ -92,6 +87,35 @@ while ($row = $result->fetch_assoc()) {
                 </button>
 
             </div>
+
+            <?php if (isset($_GET["success"])): ?>
+
+                <div
+                    id="message"
+                    class="bg-green-100 text-green-700 px-5 py-4 rounded-lg mb-6">
+
+                    <?php if ($_GET["success"] === "added"): ?>
+                        Book added successfully.
+                    <?php elseif ($_GET["success"] === "updated"): ?>
+                        Book updated successfully.
+                    <?php elseif ($_GET["success"] === "deleted"): ?>
+                        Book deleted successfully.
+                    <?php endif; ?>
+
+                </div>
+
+            <?php endif; ?>
+
+
+            <?php if (isset($_GET["error"]) && $_GET["error"] === "has_history"): ?>
+
+                <div
+                    id="message"
+                    class="bg-red-100 text-red-700 px-5 py-4 rounded-lg mb-6">
+                    Cannot delete this book because it has existing issue/return records.
+                </div>
+
+            <?php endif; ?>
 
 
             <!-- Search -->
@@ -222,6 +246,16 @@ while ($row = $result->fetch_assoc()) {
         const books = <?php echo json_encode($books); ?>
     </script>
     <script src="../assets/js/books.js"></script>
+
+    <script>
+        const message = document.getElementById("message");
+
+        if (message) {
+            setTimeout(function() {
+                message.remove();
+            }, 3000);
+        }
+    </script>
 
 </body>
 

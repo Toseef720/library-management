@@ -47,6 +47,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stmt->execute();
     }
 
-    header("Location: ../pages/books.php");
+    header("Location: ../pages/books.php?success=updated");
     exit;
 }
